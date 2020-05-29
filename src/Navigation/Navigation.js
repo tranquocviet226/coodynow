@@ -21,7 +21,7 @@ import ListFood from '../screens/ListFood';
 import SearchScreen from '../screens/SearchScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import DetailFood from '../screens/DetailFood';
-import {TransitionPresets} from '@react-navigation/stack';
+import {useSelector} from 'react-redux';
 
 const IconWithBadge = ({name, badgeCount, color, focused, navigation}) => {
   return (
@@ -44,6 +44,13 @@ const IconWithBadge = ({name, badgeCount, color, focused, navigation}) => {
 
 const RootTab = createBottomTabNavigator();
 const TabScreen = () => {
+  const badgeCountNum = useSelector(state => {
+    const newCartData = [];
+    for (const key in state.cartItems.items) {
+      newCartData.push({key});
+    }
+    return newCartData.length;
+  });
   return (
     <RootTab.Navigator
       tabBarOptions={{activeTintColor: '#f96c2a', showLabel: false}}
@@ -61,7 +68,7 @@ const TabScreen = () => {
                 name={focused ? 'cart' : 'cart-outline'}
                 size={size}
                 color={color}
-                badgeCount={3}
+                badgeCount={badgeCountNum}
                 focused={focused}
                 navigation={navigation}
               />

@@ -102,6 +102,19 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     margin: 10,
   },
-  input: {paddingLeft: 10, paddingRight: 50, width: '90%', color: 'black'},
-  searchIcon: {position: 'absolute', width: 50, right: -10},
+  input: {
+    paddingLeft: 10,
+    paddingRight: 50,
+    width: '90%',
+    color: 'black',
+  },
+  searchIcon: {
+    position: 'absolute',
+    width: 50,
+    right: -10,
+    elevation: 3,
+    shadowOffset: {width: 0, height: 5},
+    shadowOpacity: 0.5,
+    shadowRadius: 5,
+  },
 });

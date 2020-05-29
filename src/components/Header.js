@@ -1,8 +1,10 @@
 import React from 'react';
 import {StyleSheet, Text, View, TouchableOpacity, Platform} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {useNavigation} from '@react-navigation/native';
 
-const Header = ({navigation}) => {
+const Header = ({navigation, title, iconName, isCartIcon}) => {
+  const navigationOp = useNavigation();
   return (
     <View style={styles.headerCon}>
       <TouchableOpacity
@@ -10,9 +12,19 @@ const Header = ({navigation}) => {
         style={styles.iconLeft}>
         <Icon name="chevron-left" color="black" size={30} />
       </TouchableOpacity>
-      <Text style={styles.title}>{`Menu`.toLocaleUpperCase()}</Text>
-      <TouchableOpacity>
-        <Icon name="heart-outline" size={30} color="yellow" />
+      <Text ellipsizeMode="clip" numberOfLines={1} style={styles.title}>
+        {`${title}`.toLocaleUpperCase()}
+      </Text>
+      {isCartIcon && (
+        <TouchableOpacity
+          onPress={() => navigationOp.navigate('Cart')}
+          style={styles.iconRight}>
+          <Icon name="cart-outline" size={30} color="#FFF" />
+        </TouchableOpacity>
+      )}
+
+      <TouchableOpacity style={styles.iconRight}>
+        <Icon name={iconName} size={30} color={isCartIcon ? "yellow" : "#FFF"} />
       </TouchableOpacity>
     </View>
   );
@@ -22,7 +34,7 @@ export default Header;
 
 const styles = StyleSheet.create({
   headerCon: {
-    marginTop: Platform.OS === "android" ? 25 : 0,
+    marginTop: Platform.OS === 'android' ? 25 : 0,
     height: 45,
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -37,9 +49,19 @@ const styles = StyleSheet.create({
     borderColor: 'gray',
     padding: 7,
   },
+  iconRight: {
+    width: 44,
+    height: 44,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    padding: 5,
+    borderRadius: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   title: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: "#4c4c4c"
+    color: '#4c4c4c',
+    width: '50%',
   },
 });

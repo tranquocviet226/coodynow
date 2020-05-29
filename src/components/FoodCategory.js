@@ -35,6 +35,10 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
+    elevation: 4,
+    shadowOffset: {width: 0, height: 5},
+    shadowOpacity: 0.5,
+    shadowRadius: 2,
   },
   title: {fontSize: 18, textAlign: 'center'},
 });

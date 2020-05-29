@@ -1,14 +1,25 @@
 import React from 'react';
-import {StyleSheet, Text, TouchableOpacity, Image} from 'react-native';
+import {StyleSheet, Text, TouchableOpacity, Image, View} from 'react-native';
 
 const FoodMenuItem = ({bgColor, title, image, onSelectMenu}) => {
   return (
-    <TouchableOpacity
-      onPress={onSelectMenu}
-      style={[styles.container, {backgroundColor: bgColor}]}>
-      <Text style={styles.title}>{title}</Text>
-      <Image source={image} style={styles.img} />
-    </TouchableOpacity>
+    <View
+      style={{
+        flex: 1,
+        elevation: 3,
+        shadowOffset: {width: 0, height: 3},
+        shadowOpacity: 0.3,
+        shadowRadius: 3,
+        marginHorizontal: 10,
+        marginVertical: 7,
+      }}>
+      <TouchableOpacity
+        onPress={onSelectMenu}
+        style={[styles.container, {backgroundColor: bgColor}]}>
+        <Text style={styles.title}>{title}</Text>
+        <Image source={image} style={styles.img} />
+      </TouchableOpacity>
+    </View>
   );
 };
 
@@ -17,8 +28,6 @@ export default FoodMenuItem;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginHorizontal: 10,
-    marginVertical: 5,
     height: 200,
     borderRadius: 20,
     overflow: 'hidden',

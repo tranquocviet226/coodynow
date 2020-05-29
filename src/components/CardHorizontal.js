@@ -1,7 +1,16 @@
-import React from 'react';
-import {StyleSheet, Text, View, TouchableOpacity, Image} from 'react-native';
+import React, {useRef, useState} from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  Animated,
+  ActivityIndicator,
+  Easing,
+} from 'react-native';
 import StarRating from '../components/StarRating';
 import {SharedElement} from 'react-navigation-shared-element';
+import CurrencyFormat from './CurrencyFormat';
 
 const colors = [
   '#f5dfd4',
@@ -16,25 +25,77 @@ const colors = [
   '#ffccb7',
 ];
 
-const CardHorizontal = ({item, onSelectFood}) => {
+const CardHorizontal = ({item, onSelectFood, onAddToCart}) => {
   const randomColor = Math.floor(Math.random() * colors.length);
+  const [isLoading, setIsLoading] = useState(false);
+  const size = useRef(new Animated.Value(1)).current;
+  const opacity = useRef(new Animated.Value(1)).current;
+
+  const addToCart = () => {
+    setIsLoading(true);
+    Animated.sequence([
+      Animated.parallel([
+        Animated.timing(opacity, {
+          toValue: 0,
+          duration: 800,
+          useNativeDriver: false,
+        }),
+        Animated.timing(size, {
+          toValue: 0.3,
+          easing: Easing.back(),
+          duration: 800,
+          useNativeDriver: false,
+        }),
+      ]),
+      Animated.timing(size, {
+        toValue: 1,
+        duration: 0,
+        useNativeDriver: false,
+      }),
+      Animated.timing(opacity, {
+        toValue: 1,
+        duration: 500,
+        useNativeDriver: false,
+      }),
+    ]).start(() => {
+      setIsLoading(false);
+      onAddToCart();
+    });
+  };
   return (
-    <View style={[styles.cardContainer, {backgroundColor: colors[randomColor]}]}>
-      <TouchableOpacity onPress={onSelectFood}>
+    <View
+      style={[styles.cardContainer, {backgroundColor: colors[randomColor]}]}>
+      <TouchableOpacity onPress={onSelectFood} style={styles.imgShadow}>
         <SharedElement id={item.id}>
-          <Image source={{uri: item.image}} style={styles.cardImg} />
+          <Animated.Image
+            source={{uri: item.image}}
+            style={[
+              styles.cardImg,
+              {
+                opacity,
+                transform: [{scale: size}],
+              },
+            ]}
+          />
         </SharedElement>
       </TouchableOpacity>
       <Text ellipsizeMode="tail" numberOfLines={2} style={styles.cardTitle}>
         {item.title}
       </Text>
       <StarRating rate={Math.round(item.rate)} />
-      <Text  ellipsizeMode="tail" numberOfLines={1}  style={styles.cardPrice}>
-      {'\u20AB'} {item.price} 
+      <Text ellipsizeMode="tail" numberOfLines={1} style={styles.cardPrice}>
+        {'\u20AB'} {CurrencyFormat(item.price)}
       </Text>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.btn}>
-          <Text style={styles.txtBtn}>Buy</Text>
+        <TouchableOpacity
+          onPress={addToCart}
+          disabled={isLoading ? true : false}
+          style={styles.btn}>
+          {isLoading ? (
+            <ActivityIndicator size={17} />
+          ) : (
+            <Text style={styles.txtBtn}>Buy</Text>
+          )}
         </TouchableOpacity>
         <TouchableOpacity onPress={onSelectFood} style={styles.btn}>
           <Text style={styles.txtBtn}>More</Text>
@@ -55,19 +116,29 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: 'center',
     elevation: 3,
-    shadowColor: "gray",
+    shadowColor: 'gray',
     shadowOpacity: 0.5,
     shadowRadius: 3,
     shadowOffset: {
       height: 3,
-      width: 0
-    }
+      width: 0,
+    },
+  },
+  imgShadow: {
+    shadowColor: 'gray',
+    shadowOpacity: 0.5,
+    shadowRadius: 3,
+    shadowOffset: {
+      height: 5,
+      width: 0,
+    },
+    borderRadius: 45,
   },
   cardImg: {
     width: 100,
     height: 100,
     borderRadius: 50,
-    resizeMode: "cover"
+    resizeMode: 'cover',
   },
   cardTitle: {
     width: 150,
@@ -78,7 +149,7 @@ const styles = StyleSheet.create({
     width: 150,
     fontSize: 19,
     fontWeight: 'bold',
-    textAlign:'center'
+    textAlign: 'center',
   },
   buttonContainer: {
     flexDirection: 'row',

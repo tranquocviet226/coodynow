@@ -1,14 +1,17 @@
-import React from 'react';
+import React, {useRef, useState} from 'react';
 import {
   StyleSheet,
   Text,
   View,
   TouchableOpacity,
-  Image,
+  Easing,
   Dimensions,
+  Animated,
+  ActivityIndicator,
 } from 'react-native';
 import StarRating from '../components/StarRating';
 import {SharedElement} from 'react-navigation-shared-element';
+import CurrencyFormat from './CurrencyFormat';
 
 const colors = [
   '#f5dfd4',
@@ -23,15 +26,78 @@ const colors = [
   '#ffccb7',
 ];
 const W = Dimensions.get('window').width;
+const H = Dimensions.get('window').height;
 
-const CardVertical = ({item, onSelectFood}) => {
+const CardVertical = ({item, onSelectFood, onAddToCart}) => {
   const randomColor = Math.floor(Math.random() * colors.length);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const move = useRef(new Animated.ValueXY({x: 0, y: 0})).current;
+  const size = useRef(new Animated.Value(1)).current;
+  const opacity = useRef(new Animated.Value(1)).current;
+
+  const addToCart = () => {
+    setIsLoading(true);
+    //sequence : tuần tự
+    // parallel: song song
+    Animated.sequence([
+      Animated.parallel([
+        Animated.timing(move, {
+          toValue: {x: -20, y: -20},
+          duration: 800,
+          easing: Easing.linear,
+          useNativeDriver: false,
+        }),
+        Animated.timing(opacity, {
+          toValue: 0,
+          duration: 800,
+          useNativeDriver: false,
+        }),
+        Animated.timing(size, {
+          toValue: 0.3,
+          duration: 800,
+          easing: Easing.back(),
+          useNativeDriver: false,
+        }),
+      ]),
+      Animated.timing(size, {
+        toValue: 1,
+        duration: 0,
+        useNativeDriver: false,
+      }),
+      Animated.timing(move, {
+        toValue: {x: 0, y: 0},
+        duration: 0,
+        useNativeDriver: false,
+      }),
+      Animated.timing(opacity, {
+        toValue: 1,
+        duration: 500,
+        useNativeDriver: false,
+      }),
+    ]).start(() => {
+      onAddToCart();
+      setIsLoading(false);
+    });
+  };
+
   return (
     <View style={styles.cardContainer}>
       <View style={[styles.bgImg, {backgroundColor: colors[randomColor]}]}>
         <TouchableOpacity onPress={onSelectFood} style={styles.imgCon}>
           <SharedElement id={item.id}>
-            <Image source={{uri: item.image}} style={styles.cardImg} />
+            <Animated.Image
+              source={{uri: item.image}}
+              style={[
+                styles.cardImg,
+                {
+                  top: move.y,
+                  right: move.x,
+                  opacity,
+                  transform: [{scale: size}],
+                },
+              ]}
+            />
           </SharedElement>
         </TouchableOpacity>
       </View>
@@ -43,11 +109,18 @@ const CardVertical = ({item, onSelectFood}) => {
         </TouchableOpacity>
         <StarRating rate={Math.round(item.rate)} />
         <Text ellipsizeMode="tail" numberOfLines={1} style={styles.cardPrice}>
-          {'\u20AB'} {item.price}
+          {'\u20AB'} {CurrencyFormat(item.price)}
         </Text>
         <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.btn}>
-            <Text style={styles.txtBtn}>Buy</Text>
+          <TouchableOpacity
+            disabled={isLoading ? true : false}
+            onPress={addToCart}
+            style={styles.btn}>
+            {isLoading ? (
+              <ActivityIndicator size={17} color="#FFF" />
+            ) : (
+              <Text style={styles.txtBtn}>Buy</Text>
+            )}
           </TouchableOpacity>
           <TouchableOpacity onPress={onSelectFood} style={styles.btn}>
             <Text style={styles.txtBtn}>More</Text>
@@ -84,7 +157,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -20,
     right: -10,
-    elevation: 5,
     borderRadius: 50,
     shadowColor: 'black',
     shadowOpacity: 0.5,

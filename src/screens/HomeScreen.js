@@ -14,7 +14,6 @@ import FoodCategory from '../components/FoodCategory';
 import FoodMenuItem from '../components/FoodMenuItem';
 
 const W = Dimensions.get('window').width;
-const H = Dimensions.get('window').height;
 
 const HomeScreen = ({navigation}) => {
   const [counter, setCounter] = useState(0);
