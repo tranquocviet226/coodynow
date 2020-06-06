@@ -1,13 +1,23 @@
-import React from 'react';
-import {Text, Image, FlatList, View} from 'react-native';
-import CardHorizontal from '../components/CardHorizontal';
-import CardVertical from '../components/CardVertical';
-import BackIcon from '../components/BackIcon';
-import {useDispatch} from 'react-redux';
-import * as CartAction from '../store/action/CartAction';
+import React, {useEffect, useState} from 'react';
+import {
+  Text,
+  Image,
+  FlatList,
+  View,
+  SafeAreaView,
+  Animated,
+  Alert,
+} from 'react-native';
+import CardHorizontal from '../../components/CardHorizontal';
+import CardVertical from '../../components/CardVertical';
+import Header from '../../components/Header';
+import {useDispatch, useSelector} from 'react-redux';
+import * as CartAction from '../../store/action/CartAction';
 
 const ListFood = ({route, navigation}) => {
   const {title, image} = route.params;
+
+  const scrollY = new Animated.Value(0);
 
   const selectFoodHandler = item => {
     navigation.navigate('Detail', {
@@ -15,26 +25,40 @@ const ListFood = ({route, navigation}) => {
     });
   };
 
-  const dispatch = useDispatch();
+  const id = useSelector(state => state.authReducer.id);
 
+  const total = useSelector(state => state.cartItems.total);
+  const items = useSelector(state => state.cartItems.items);
+  const cart = {total, items: items};
+
+  const dispatch = useDispatch();
   const addToCart = items => {
     dispatch(CartAction.addToCart(items));
   };
 
+  useEffect(() => {
+    dispatch(CartAction.cartToServer(id, cart));
+  }, [dispatch, addToCart]);
+
   return (
-    <View style={{flex: 1, backgroundColor: '#FFF', paddingHorizontal: 10}}>
+    <SafeAreaView
+      style={{flex: 1, backgroundColor: '#f7f7f7', paddingHorizontal: 10}}>
+      <Header
+        navigation={navigation}
+        title={title}
+        isCartIcon={true}
+        iconName="forum"
+      />
       <FlatList
+        onScroll={e => {
+          scrollY.setValue(e.nativeEvent.contentOffset.y);
+        }}
         ListHeaderComponent={
           <View>
-            <BackIcon navigation={navigation} />
             <Image
               source={image}
               style={{width: '100%', height: 200, resizeMode: 'stretch'}}
             />
-            <Text
-              style={{textAlign: 'center', fontSize: 20, fontWeight: 'bold'}}>
-              {title}
-            </Text>
             <Text
               style={{fontWeight: 'bold', fontSize: 16, paddingHorizontal: 5}}>
               Recommend Today
@@ -47,6 +71,7 @@ const ListFood = ({route, navigation}) => {
               renderItem={itemData => (
                 <CardHorizontal
                   item={itemData.item}
+                  id={id}
                   onSelectFood={() => selectFoodHandler(itemData.item)}
                   onAddToCart={() => addToCart(itemData.item)}
                 />
@@ -69,12 +94,13 @@ const ListFood = ({route, navigation}) => {
         renderItem={itemData => (
           <CardVertical
             item={itemData.item}
+            id={id}
             onSelectFood={() => selectFoodHandler(itemData.item)}
             onAddToCart={() => addToCart(itemData.item)}
           />
         )}
       />
-    </View>
+    </SafeAreaView>
   );
 };
 

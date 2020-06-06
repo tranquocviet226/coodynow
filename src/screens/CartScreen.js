@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useRef, useEffect, useState, useCallback, useMemo} from 'react';
 import {
   Text,
   View,
@@ -6,15 +6,31 @@ import {
   StyleSheet,
   SafeAreaView,
   FlatList,
+  Platform,
+  Image,
+  Dimensions,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import CardCart from '../components/CardCart';
+import CurrencyFormat from '../components/CurrencyFormat';
+import RequireLogin from '../components/RequireLogin';
+import LinearGradient from 'react-native-linear-gradient';
 import {useDispatch, useSelector} from 'react-redux';
 import * as CartAction from '../store/action/CartAction';
+import * as AuthAction from '../store/action/AuthAction';
+import {Colors} from '../Constrains/Colors';
+
+const W = Dimensions.get('window').width;
 
 const CartScreen = ({navigation}) => {
-  const [isLoading, setIsLoading]= useState(false);
+  const user_info = useSelector(state => state.authReducer.user_info);
+  const id = useSelector(state => state.authReducer.id);
+
   const total = useSelector(state => state.cartItems.total);
+  const onSignoutHandle = () => {
+    dispatch(AuthAction.signOut());
+    navigation.replace('Login');
+  };
 
   const cartData = useSelector(state => {
     const newCartData = [];
@@ -38,35 +54,79 @@ const CartScreen = ({navigation}) => {
   const inCreaseItem = items => {
     dispatch(CartAction.addToCart(items));
   };
+
   const deCreaseItem = id => {
     dispatch(CartAction.removeCart(id));
   };
 
+  const payHandle = () => {
+    if (user_info != null) {
+      if (total !== 0) {
+        alert('Order successfully!');
+      } else {
+        alert('Please select some product');
+      }
+    } else {
+      alert('Please login');
+    }
+  };
+
+  const items = useSelector(state => state.cartItems.items);
+
+  const cart = {total, items: items};
+
+  useEffect(() => {
+      dispatch(CartAction.cartToServer(id, cart));
+  }, [dispatch, inCreaseItem, deCreaseItem]);
+
+  if (!user_info) {
+    return (
+      <View>
+        <LinearGradient
+          colors={['#ffbbdc', '#ffbbdc', '#ffbbdc', '#7ae1f2']}
+          style={styles.cardBg}
+        />
+        <RequireLogin onGoToLogin={() => onSignoutHandle()} />
+      </View>
+    );
+  }
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.totalContent}>
         <View style={styles.totalCom}>
           <Text style={styles.total}>Total: </Text>
           <Text style={styles.totalTxt}>
-            {'\u20AB'} {total}
+            {'\u20AB'} {CurrencyFormat(total)}
           </Text>
         </View>
-        <TouchableOpacity>
-          <Icon name="send" size={30} color="black" />
+        <TouchableOpacity onPress={() => payHandle()}>
+          <Icon name="send" size={30} color={Colors.orange} />
         </TouchableOpacity>
       </View>
-      <FlatList
-        showsVerticalScrollIndicator={false}
-        data={cartData}
-        keyExtractor={item => item.id.toString()}
-        renderItem={itemData => (
-          <CardCart
-            item={itemData.item}
-            onIncrease={() => inCreaseItem(itemData.item)}
-            onDecrease={() => deCreaseItem(itemData.item.id)}
+      {total === 0 ? (
+        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+          <Image
+            source={require('../../assets/images/shopping_cart.png')}
+            style={styles.shoppingCart}
           />
-        )}
-      />
+          <Text style={styles.noProduct}>
+            Không có sản phẩm nào trong giỏ hàng. Hãy thêm một vài sản phẩm!
+          </Text>
+        </View>
+      ) : (
+        <FlatList
+          showsVerticalScrollIndicator={false}
+          data={cartData}
+          keyExtractor={item => item.id.toString()}
+          renderItem={itemData => (
+            <CardCart
+              item={itemData.item}
+              onIncrease={() => inCreaseItem(itemData.item)}
+              onDecrease={() => deCreaseItem(itemData.item.id)}
+            />
+          )}
+        />
+      )}
     </SafeAreaView>
   );
 };
@@ -74,7 +134,20 @@ const CartScreen = ({navigation}) => {
 export default CartScreen;
 
 const styles = StyleSheet.create({
-  container: {flex: 1, backgroundColor: '#ecf0f3'},
+  container: {
+    flex: 1,
+    backgroundColor: '#ecf0f3',
+    marginTop: Platform.OS === 'android' ? 25 : null,
+  },
+  cardBg: {
+    position: 'absolute',
+    height: W * 2,
+    width: W * 2,
+    backgroundColor: Colors.green,
+    borderRadius: W,
+    left: -W / 2,
+    top: -((W * 5) / 4),
+  },
   totalContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -88,7 +161,19 @@ const styles = StyleSheet.create({
   },
   totalCom: {flexDirection: 'row', alignItems: 'center'},
   total: {fontSize: 16, fontWeight: 'bold'},
-  totalTxt: {fontSize: 20, fontWeight: 'bold', color: '#2cc879'},
+  totalTxt: {fontSize: 20, fontWeight: 'bold', color: Colors.orange},
+  noProduct: {
+    textAlign: 'center',
+    fontSize: 18,
+    color: 'gray',
+    paddingHorizontal: 15,
+  },
+  shoppingCart: {
+    width: 130,
+    height: 80,
+    resizeMode: 'stretch',
+    marginBottom: 10,
+  },
 });
 
 const data = [

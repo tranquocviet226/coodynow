@@ -25,42 +25,46 @@ const colors = [
   '#ffccb7',
 ];
 
-const CardHorizontal = ({item, onSelectFood, onAddToCart}) => {
+const CardHorizontal = ({item, id, onSelectFood, onAddToCart}) => {
   const randomColor = Math.floor(Math.random() * colors.length);
   const [isLoading, setIsLoading] = useState(false);
   const size = useRef(new Animated.Value(1)).current;
   const opacity = useRef(new Animated.Value(1)).current;
 
   const addToCart = () => {
-    setIsLoading(true);
-    Animated.sequence([
-      Animated.parallel([
-        Animated.timing(opacity, {
-          toValue: 0,
-          duration: 800,
-          useNativeDriver: false,
-        }),
+    if (id == null) {
+      alert('Vui lòng đăng nhập để mua hàng');
+    } else {
+      setIsLoading(true);
+      Animated.sequence([
+        Animated.parallel([
+          Animated.timing(opacity, {
+            toValue: 0,
+            duration: 800,
+            useNativeDriver: false,
+          }),
+          Animated.timing(size, {
+            toValue: 0.3,
+            easing: Easing.back(),
+            duration: 800,
+            useNativeDriver: false,
+          }),
+        ]),
         Animated.timing(size, {
-          toValue: 0.3,
-          easing: Easing.back(),
-          duration: 800,
+          toValue: 1,
+          duration: 0,
           useNativeDriver: false,
         }),
-      ]),
-      Animated.timing(size, {
-        toValue: 1,
-        duration: 0,
-        useNativeDriver: false,
-      }),
-      Animated.timing(opacity, {
-        toValue: 1,
-        duration: 500,
-        useNativeDriver: false,
-      }),
-    ]).start(() => {
-      setIsLoading(false);
-      onAddToCart();
-    });
+        Animated.timing(opacity, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: false,
+        }),
+      ]).start(() => {
+        setIsLoading(false);
+        onAddToCart();
+      });
+    }
   };
   return (
     <View

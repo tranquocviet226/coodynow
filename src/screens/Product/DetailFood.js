@@ -12,12 +12,12 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import {SharedElement} from 'react-navigation-shared-element';
-import Header from '../components/Header';
-import {Colors} from '../Constrains/Colors';
-import StarRating from '../components/StarRating';
-import CurrencyFormat from '../components/CurrencyFormat';
+import Header from '../../components/Header';
+import {Colors} from '../../Constrains/Colors';
+import StarRating from '../../components/StarRating';
+import CurrencyFormat from '../../components/CurrencyFormat';
 import {useDispatch} from 'react-redux'
-import * as CartAction from '../store/action/CartAction'
+import * as CartAction from '../../store/action/CartAction'
 
 const W = Dimensions.get('window').width;
 const H = Dimensions.get('window').height;
@@ -100,7 +100,7 @@ const DetailFood = ({navigation, route}) => {
         <Text
           ellipsizeMode="middle"
           numberOfLines={3}
-          style={[styles.title, {color: Colors.green}]}>
+          style={[styles.title, {color: Colors.orange}]}>
           {item.title.toUpperCase()}
         </Text>
         <Text style={styles.author}>with Sauteed Shrimp</Text>
@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     padding: 15,
     borderRadius: 20,
-    backgroundColor: Colors.green,
+    backgroundColor: Colors.orange,
     width: '80%',
     alignSelf: 'center',
     elevation: 3,

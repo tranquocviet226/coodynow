@@ -12,16 +12,19 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {NavigationContainer} from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createSharedElementStackNavigator} from 'react-navigation-shared-element';
+import { CardStyleInterpolators } from '@react-navigation/stack';
 
-import SplashScreen from '../screens/SplashScreen';
-import HomeScreen from '../screens/HomeScreen';
+import SplashScreen from '../screens/Auth/SplashScreen';
+import LoginScreen from '../screens/Auth/LoginScreen';
+import HomeScreen from '../screens/Product/HomeScreen';
 import CartScreen from '../screens/CartScreen';
 import FavoriteScreen from '../screens/FavoriteScreen';
-import ListFood from '../screens/ListFood';
+import ListFood from '../screens/Product/ListFood';
 import SearchScreen from '../screens/SearchScreen';
 import ProfileScreen from '../screens/ProfileScreen';
-import DetailFood from '../screens/DetailFood';
+import DetailFood from '../screens/Product/DetailFood';
 import {useSelector} from 'react-redux';
+import ModalScreen from '../screens/Product/ModalScreen';
 
 const IconWithBadge = ({name, badgeCount, color, focused, navigation}) => {
   return (
@@ -112,6 +115,14 @@ const HomeStackScreen = () => {
           headerTitleAlign: 'center',
           headerShown: false,
         }}>
+        <HomeStack.Screen name="Splash" component={SplashScreen} />
+        <HomeStack.Screen
+          name="Login"
+          component={LoginScreen}
+          options={{
+            cardStyleInterpolator: CardStyleInterpolators.forFadeFromBottomAndroid,
+          }}
+        />
         <HomeStack.Screen name="Home" component={TabScreen} />
         <HomeStack.Screen name="List" component={ListFood} />
         <HomeStack.Screen
@@ -128,6 +139,7 @@ const HomeStackScreen = () => {
             },
           }}
         />
+        <HomeStack.Screen name="Modal" component={ModalScreen} />
       </HomeStack.Navigator>
     </NavigationContainer>
   );

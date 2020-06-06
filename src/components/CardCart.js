@@ -9,10 +9,10 @@ import {
   TextInput,
   Platform,
 } from 'react-native';
+import {Colors} from '../Constrains/Colors';
 
 const W = Dimensions.get('window').width;
 const CardCart = ({item, onIncrease, onDecrease}) => {
-
   return (
     <View style={styles.container}>
       <View style={styles.imgCon}>
@@ -29,9 +29,7 @@ const CardCart = ({item, onIncrease, onDecrease}) => {
         </Text>
         <View
           style={[styles.btnCon, {marginTop: Platform.OS === 'ios' ? 5 : -10}]}>
-          <TouchableOpacity
-            onPress={onDecrease}
-            style={styles.btnTouch}>
+          <TouchableOpacity onPress={onDecrease} style={styles.btnTouch}>
             <Text style={styles.btnTxt}>-</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.btnTouch}>
@@ -41,9 +39,7 @@ const CardCart = ({item, onIncrease, onDecrease}) => {
               // onChangeText={newVal => setQuantity(newVal)}
             />
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={onIncrease}
-            style={styles.btnTouch}>
+          <TouchableOpacity onPress={onIncrease} style={styles.btnTouch}>
             <Text style={styles.btnTxt}>+</Text>
           </TouchableOpacity>
         </View>
@@ -94,7 +90,7 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
   },
   content: {width: W / 2, justifyContent: 'center', margin: 5},
-  price: {fontSize: 19, fontWeight: 'bold', color: '#2cc879'},
+  price: {fontSize: 19, fontWeight: 'bold', color: Colors.orange},
   title: {fontWeight: 'bold', fontSize: 16, marginVertical: 10},
   btnCon: {flexDirection: 'row', alignItems: 'center'},
   btnTouch: {

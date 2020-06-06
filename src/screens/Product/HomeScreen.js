@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   StyleSheet,
   Text,
@@ -7,11 +7,15 @@ import {
   FlatList,
   ActivityIndicator,
   Dimensions,
+  SafeAreaView,
 } from 'react-native';
-import SlideImage from '../components/SlideImage';
-import SearchBar from '../components/SearchBar';
-import FoodCategory from '../components/FoodCategory';
-import FoodMenuItem from '../components/FoodMenuItem';
+import SlideImage from '../../components/SlideImage';
+import SearchBar from '../../components/SearchBar';
+import FoodCategory from '../../components/FoodCategory';
+import FoodMenuItem from '../../components/FoodMenuItem';
+import * as AuthAction from '../../store/action/AuthAction';
+import * as CartAction from '../../store/action/CartAction';
+import {useDispatch, useSelector} from 'react-redux';
 
 const W = Dimensions.get('window').width;
 
@@ -33,20 +37,40 @@ const HomeScreen = ({navigation}) => {
   };
 
   const submitHandler = value => {
-    navigation.navigate("Search", {
-        value: value
-    })
+    navigation.navigate('Search', {
+      value: value,
+    });
   };
 
-  const selectMenuHandler = (item) => {
-      navigation.navigate("List", {
-        title: item.title,
-        image: item.image
-      })
-  }
-  
+  const selectMenuHandler = item => {
+    navigation.navigate('List', {
+      title: item.title,
+      image: item.image,
+    });
+  };
+
+  const id = useSelector(state => state.authReducer.id);
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (id != undefined) {
+      try {
+        dispatch(AuthAction.fetchProfile(id));
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  }, [id]);
+
+  useEffect(() => {
+    if (id) {
+      dispatch(CartAction.fetchCart(id));
+    }
+  }, []);
+
   return (
-    <View style={styles.safeView}>
+    <SafeAreaView style={styles.safeView}>
       {isLoading ? (
         <View style={styles.loading}>
           <ActivityIndicator size="large" color="red" />
@@ -54,6 +78,7 @@ const HomeScreen = ({navigation}) => {
       ) : null}
 
       <FlatList
+      showsVerticalScrollIndicator={false}
         ListHeaderComponent={() => (
           <View>
             <SlideImage />
@@ -84,7 +109,7 @@ const HomeScreen = ({navigation}) => {
           />
         )}
       />
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -93,7 +118,7 @@ export default HomeScreen;
 const styles = StyleSheet.create({
   safeView: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: '#f7f7f7',
   },
   title: {
     fontSize: 28,
@@ -120,25 +145,25 @@ const categoryData = [
       {
         id: 1,
         title: 'Pizza',
-        image: require('../../assets/images/pizza.png'),
+        image: require('../../../assets/images/pizza.png'),
         bgColor: 'rgb(228, 239, 222)',
       },
       {
         id: 2,
         title: 'BBQ',
-        image: require('../../assets/images/bbq.png'),
+        image: require('../../../assets/images/bbq.png'),
         bgColor: 'rgb(227, 227, 240)',
       },
       {
         id: 3,
         title: 'Sushi',
-        image: require('../../assets/images/sushi.png'),
+        image: require('../../../assets/images/sushi.png'),
         bgColor: 'rgb(219, 234, 243)',
       },
       {
         id: 4,
         title: 'Burgers',
-        image: require('../../assets/images/burger.png'),
+        image: require('../../../assets/images/burger.png'),
         bgColor: 'rgb(245, 223, 212)',
       },
     ],
@@ -151,31 +176,31 @@ const categoryData = [
       {
         id: 1,
         title: 'Coffee',
-        image: require('../../assets/images/sushi.png'),
+        image: require('../../../assets/images/sushi.png'),
         bgColor: 'rgb(228, 239, 222)',
       },
       {
         id: 2,
         title: 'Water',
-        image: require('../../assets/images/sushi.png'),
+        image: require('../../../assets/images/sushi.png'),
         bgColor: 'rgb(227, 227, 240)',
       },
       {
         id: 3,
         title: 'Fruit Juice',
-        image: require('../../assets/images/sushi.png'),
+        image: require('../../../assets/images/sushi.png'),
         bgColor: 'rgb(219, 234, 243)',
       },
       {
         id: 4,
         title: 'Cocktails',
-        image: require('../../assets/images/sushi.png'),
+        image: require('../../../assets/images/sushi.png'),
         bgColor: 'rgb(245, 223, 212)',
       },
       {
         id: 5,
         title: 'Fruit Juice',
-        image: require('../../assets/images/sushi.png'),
+        image: require('../../../assets/images/sushi.png'),
         bgColor: 'rgb(219, 234, 243)',
       },
     ],

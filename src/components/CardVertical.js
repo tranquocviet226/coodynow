@@ -28,7 +28,7 @@ const colors = [
 const W = Dimensions.get('window').width;
 const H = Dimensions.get('window').height;
 
-const CardVertical = ({item, onSelectFood, onAddToCart}) => {
+const CardVertical = ({item, id, onSelectFood, onAddToCart}) => {
   const randomColor = Math.floor(Math.random() * colors.length);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -37,48 +37,52 @@ const CardVertical = ({item, onSelectFood, onAddToCart}) => {
   const opacity = useRef(new Animated.Value(1)).current;
 
   const addToCart = () => {
-    setIsLoading(true);
-    //sequence : tuần tự
-    // parallel: song song
-    Animated.sequence([
-      Animated.parallel([
+    if (id == null) {
+      alert('Vui lòng đăng nhập để mua hàng!');
+    } else {
+      setIsLoading(true);
+      //sequence : tuần tự
+      // parallel: song song
+      Animated.sequence([
+        Animated.parallel([
+          Animated.timing(move, {
+            toValue: {x: -20, y: -20},
+            duration: 800,
+            easing: Easing.linear,
+            useNativeDriver: false,
+          }),
+          Animated.timing(opacity, {
+            toValue: 0,
+            duration: 800,
+            useNativeDriver: false,
+          }),
+          Animated.timing(size, {
+            toValue: 0.3,
+            duration: 800,
+            easing: Easing.back(),
+            useNativeDriver: false,
+          }),
+        ]),
+        Animated.timing(size, {
+          toValue: 1,
+          duration: 0,
+          useNativeDriver: false,
+        }),
         Animated.timing(move, {
-          toValue: {x: -20, y: -20},
-          duration: 800,
-          easing: Easing.linear,
+          toValue: {x: 0, y: 0},
+          duration: 0,
           useNativeDriver: false,
         }),
         Animated.timing(opacity, {
-          toValue: 0,
-          duration: 800,
+          toValue: 1,
+          duration: 500,
           useNativeDriver: false,
         }),
-        Animated.timing(size, {
-          toValue: 0.3,
-          duration: 800,
-          easing: Easing.back(),
-          useNativeDriver: false,
-        }),
-      ]),
-      Animated.timing(size, {
-        toValue: 1,
-        duration: 0,
-        useNativeDriver: false,
-      }),
-      Animated.timing(move, {
-        toValue: {x: 0, y: 0},
-        duration: 0,
-        useNativeDriver: false,
-      }),
-      Animated.timing(opacity, {
-        toValue: 1,
-        duration: 500,
-        useNativeDriver: false,
-      }),
-    ]).start(() => {
-      onAddToCart();
-      setIsLoading(false);
-    });
+      ]).start(() => {
+        onAddToCart();
+        setIsLoading(false);
+      });
+    }
   };
 
   return (

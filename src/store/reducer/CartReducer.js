@@ -1,4 +1,4 @@
-import {ADD_TO_CART, REMOVE_CART} from '../action/CartAction';
+import {ADD_TO_CART, REMOVE_CART, FETCH_CART} from '../action/CartAction';
 import Cart from '../model/CartModel';
 
 const initialState = {
@@ -8,6 +8,12 @@ const initialState = {
 
 export default (state = initialState, action) => {
   switch (action.type) {
+    case FETCH_CART:
+      return {
+        ...state,
+        total: action.total,
+        items: action.items
+      }
     case ADD_TO_CART:
       const price = action.items.price;
       const title = action.items.title;
