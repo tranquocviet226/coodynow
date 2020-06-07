@@ -12,8 +12,10 @@ import io from 'socket.io-client';
 import Header from '../../components/Header';
 import {useSelector, useDispatch} from 'react-redux';
 import * as AuthReducer from '../../store/action/AuthAction';
+import * as OrderAction from '../../store/action/OrderAction';
 import ImagePicker from 'react-native-image-crop-picker';
 import EditProfile from '../../components/EditProfile';
+import Invoice from '../../components/Invoice';
 
 const socket = io('http://172.16.39.236:3000');
 
@@ -92,7 +94,9 @@ const ModalScreen = ({route, navigation}) => {
           ),
         );
         setAvatarLoading(false);
-        Alert.alert('Thành công', "Cập nhật thông tin thành công", [{text: 'Okay'}]);
+        Alert.alert('Thành công', 'Cập nhật thông tin thành công', [
+          {text: 'Okay'},
+        ]);
       } catch (error) {
         setError(error.message);
         setAvatarLoading(false);
@@ -130,11 +134,31 @@ const ModalScreen = ({route, navigation}) => {
   }
   //-----------------ORDER
   if (key === 'order') {
+    const [isShow, setIsShow] = useState(false);
+    const [counter, setCounter] = useState('');
+
+    const orders = useSelector(state => state.orders.orders);
+    const id = useSelector(state => state.authReducer.id);
+    const dispatch = useDispatch();
+
+    const showDetailHandle = id => {
+      setCounter(id);
+      setIsShow(prev => !prev);
+    };
+
+    useEffect(() => {
+      dispatch(OrderAction.fetchOrder(id));
+    }, []);
+
     return (
-      <SafeAreaView>
-        <View>
-          <Text>ORDER</Text>
-        </View>
+      <SafeAreaView style={{flex: 1}}>
+        <Invoice
+          orders={orders}
+          navigation={navigation}
+          isShow={isShow}
+          showDetail={(id) => showDetailHandle(id)}
+          counter={counter}
+        />
       </SafeAreaView>
     );
   }

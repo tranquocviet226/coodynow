@@ -18,6 +18,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import {useDispatch, useSelector} from 'react-redux';
 import * as CartAction from '../store/action/CartAction';
 import * as AuthAction from '../store/action/AuthAction';
+import * as OrderAction from '../store/action/OrderAction';
 import {Colors} from '../Constrains/Colors';
 
 const W = Dimensions.get('window').width;
@@ -27,6 +28,7 @@ const CartScreen = ({navigation}) => {
   const id = useSelector(state => state.authReducer.id);
 
   const total = useSelector(state => state.cartItems.total);
+
   const onSignoutHandle = () => {
     dispatch(AuthAction.signOut());
     navigation.replace('Login');
@@ -59,24 +61,34 @@ const CartScreen = ({navigation}) => {
     dispatch(CartAction.removeCart(id));
   };
 
+  // ADD ORDER
+  const items = useSelector(state => state.cartItems.items);
   const payHandle = () => {
     if (user_info != null) {
       if (total !== 0) {
-        alert('Order successfully!');
+
+        const newItems = [];
+        for (const key in items) {
+          newItems.push({
+            key: key,
+            title: items[key].title,
+            price: items[key].price,
+            quantity: items[key].quantity,
+          });
+        }
+        dispatch(OrderAction.addOrder(id, total, newItems));
+        alert('Đặt hàng thành công!');
       } else {
-        alert('Please select some product');
+        alert('Vui lòng lựa chọn một vài sản phẩm');
       }
     } else {
-      alert('Please login');
+      alert('Vui lòng đăng nhập để thanh toán');
     }
   };
 
-  const items = useSelector(state => state.cartItems.items);
-
   const cart = {total, items: items};
-
   useEffect(() => {
-      dispatch(CartAction.cartToServer(id, cart));
+    dispatch(CartAction.cartToServer(id, cart));
   }, [dispatch, inCreaseItem, deCreaseItem]);
 
   if (!user_info) {
@@ -94,7 +106,7 @@ const CartScreen = ({navigation}) => {
     <SafeAreaView style={styles.container}>
       <View style={styles.totalContent}>
         <View style={styles.totalCom}>
-          <Text style={styles.total}>Total: </Text>
+          <Text style={styles.total}>Tổng tiền: </Text>
           <Text style={styles.totalTxt}>
             {'\u20AB'} {CurrencyFormat(total)}
           </Text>

@@ -117,7 +117,7 @@ export const fetchProfile = id => {
     const json = await response.json();
 
     if (!response.ok) {
-      throw new Error('Something went wrong');
+      throw new Error('Lỗi');
     }
 
     dispatch({

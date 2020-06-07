@@ -61,12 +61,16 @@ const styles = StyleSheet.create({
   iconLeft: {
     backgroundColor: 'rgba(255, 255, 255, 0.5)',
     height: 44,
-    borderWidth: 1,
+    // borderWidth: 1,
     borderRadius: 15,
-    borderColor: 'gray',
+    // borderColor: 'gray',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 7,
+    backgroundColor: '#FFF',
+    shadowOffset: {width: 0, height: 3},
+    shadowRadius: 5,
+    shadowOpacity: 0.3,
   },
   iconRight: {
     width: 44,

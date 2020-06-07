@@ -1,4 +1,5 @@
 import 'react-native-gesture-handler';
+require('react-native').unstable_enableLogBox();
 /**
  * @format
  */
